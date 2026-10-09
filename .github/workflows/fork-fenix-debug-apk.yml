@@ -1,0 +1,65 @@
+# Fork-only CI: builds a Fenix (Firefox for Android) debug APK using Mozilla's
+# artifact mode (prebuilt Gecko binaries; no C++/Rust compilation).
+# Not part of upstream Firefox. Drop this commit before submitting patches to Phabricator.
+# See .github/workflows/FORK-CI.md for maintenance notes.
+name: Fork - Fenix debug APK
+
+on:
+  push:
+    branches: [context-menu-open-in-tab-group]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fenix-debug-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: github.repository == 'tlrdstd/firefox'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      MOZBUILD_STATE_PATH: ${{ github.workspace }}/../.mozbuild
+      MOZCONFIG: ${{ github.workspace }}/../mozconfig
+    steps:
+      # Artifact mode searches the last 500 commits for one with published Gecko
+      # binaries, so a shallow-but-not-single-commit history is required.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 500
+          filter: blob:none
+
+      - name: Write mozconfig
+        run: |
+          cat > "$MOZCONFIG" <<'EOF'
+          ac_add_options --enable-project=mobile/android
+          ac_add_options --enable-artifact-builds
+          ac_add_options --target=aarch64
+          mk_add_options MOZ_OBJDIR=@TOPSRCDIR@/objdir-frontend
+          EOF
+
+      - name: Bootstrap (artifact mode)
+        run: ./mach --no-interactive bootstrap --application-choice="GeckoView/Firefox for Android Artifact Mode"
+
+      - name: Build (downloads prebuilt Gecko)
+        run: ./mach build
+
+      - name: Assemble Fenix debug APK
+        run: ./mach gradle fenix:assembleDebug
+
+      - name: Disk usage
+        if: always()
+        run: |
+          df -h /
+          du -sh "$MOZBUILD_STATE_PATH" objdir-frontend ~/.gradle 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fenix-debug-arm64-${{ github.sha }}
+          # Only the arm64 APK contains the Gecko engine (libxul.so) for this target.
+          path: objdir-frontend/gradle/build/mobile/android/fenix/app/outputs/apk/debug/fenix-arm64-v8a-debug.apk
+          if-no-files-found: error
+          retention-days: 14

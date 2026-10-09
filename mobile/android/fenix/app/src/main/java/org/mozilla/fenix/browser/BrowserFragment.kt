@@ -90,9 +90,6 @@ import org.mozilla.fenix.summarization.SummarizationNavigator
 import org.mozilla.fenix.termsofuse.store.Surface
 import org.mozilla.fenix.utils.Settings
 
-private const val OPEN_IN_NEW_TAB_CANDIDATE_ID = "mozac.feature.contextmenu.open_in_new_tab"
-private const val OPEN_IN_NEW_TAB_IN_GROUP_CANDIDATE_ID = "fenix.contextmenu.open_in_new_tab_in_group"
-
 /** Fragment used for browsing the web within the main app. */
 @Suppress("TooManyFunctions", "LargeClass")
 class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemInsetsPaddedFragment {
@@ -546,6 +543,12 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemIns
     override fun getContextMenuCandidates(
         context: Context,
         view: View,
+    ): List<ContextMenuCandidate> =
+        getDefaultContextMenuCandidates(context, view).withOpenInNewTabInGroupCandidate(context, view)
+
+    private fun getDefaultContextMenuCandidates(
+        context: Context,
+        view: View,
     ): List<ContextMenuCandidate> {
         val contextMenuCandidateAppLinksUseCases =
             AppLinksUseCases(
@@ -595,7 +598,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemIns
                         .defaultLocation
                 },
             )
-        }.withOpenInNewTabInGroupCandidate(context) +
+        } +
             createOpenInExternalAppCandidate(
                 requireContext(),
                 contextMenuCandidateAppLinksUseCases,
@@ -635,19 +638,25 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemIns
             )
     }
 
-    /**
-     * Inserts "Open link in new tab in group" directly after "Open link in new tab".
-     * Prototype: it currently reuses the "Open in new tab" visibility rules and action.
-     */
+    /** Inserts "Open link in new tab in group" directly after "Open link in new tab". */
     private fun List<ContextMenuCandidate>.withOpenInNewTabInGroupCandidate(
         context: Context,
+        snackBarParentView: View,
     ): List<ContextMenuCandidate> {
         val index = indexOfFirst { it.id == OPEN_IN_NEW_TAB_CANDIDATE_ID }
         if (index == -1) return this
-        val openInNewTabInGroup = this[index].copy(
-            id = OPEN_IN_NEW_TAB_IN_GROUP_CANDIDATE_ID,
-            label = context.getString(R.string.context_menu_open_link_in_new_tab_in_group),
-        )
+        val components = context.components
+        val openInNewTabInGroup =
+            createOpenInNewTabInGroupCandidate(
+                context = context,
+                openInNewTabCandidate = this[index],
+                tabsUseCases = components.useCases.tabsUseCases,
+                tabGroupRepository = components.core.tabGroupRepository,
+                scope = components.applicationScope,
+                isTabGroupsEnabled = { components.settings.tabGroupsEnabled },
+                snackBarParentView = snackBarParentView,
+                snackbarDelegate = ContextMenuSnackbarDelegate(),
+            )
         return toMutableList().apply { add(index + 1, openInNewTabInGroup) }
     }
 

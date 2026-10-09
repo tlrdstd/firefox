@@ -5,10 +5,10 @@
 package org.mozilla.fenix.components.usecases
 
 import kotlinx.coroutines.flow.first
+import mozilla.components.feature.tabgroups.storage.data.TabGroup
+import mozilla.components.feature.tabgroups.storage.repository.TabGroupRepository
 import mozilla.components.support.utils.DateTimeProvider
 import mozilla.components.support.utils.DefaultDateTimeProvider
-import org.mozilla.fenix.tabgroups.storage.data.TabGroup
-import org.mozilla.fenix.tabgroups.storage.repository.TabGroupRepository
 import org.mozilla.fenix.tabstray.data.TabGroupTheme
 
 /**
@@ -46,11 +46,9 @@ class TabGroupUseCases(
                     title = defaultGroupName(tabGroupData.tabGroups.size + 1),
                     theme = TabGroupTheme.default.name,
                     lastModified = dateTimeProvider.currentTimeMillis(),
+                    tabIds = listOf(activeTabId, newTabId),
                 )
-            tabGroupRepository.createTabGroupWithTabs(
-                tabGroup = newGroup,
-                tabIds = listOf(activeTabId, newTabId),
-            )
+            tabGroupRepository.createTabGroupWithTabs(tabGroup = newGroup)
             newGroup.title
         } else {
             val activeGroup =

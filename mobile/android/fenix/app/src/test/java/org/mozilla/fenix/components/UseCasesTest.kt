@@ -11,13 +11,13 @@ import java.util.Locale
 import kotlin.test.assertEquals
 import kotlinx.coroutines.runBlocking
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.feature.tabgroups.storage.fakes.FakeTabGroupRepository
 import mozilla.components.support.locale.LocaleUseCases
 import mozilla.components.support.test.robolectric.testContext
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.settings.advanced.DefaultLocaleSettingsController
 import org.mozilla.fenix.settings.advanced.LocaleSettingsStore
-import org.mozilla.fenix.tabgroups.fakes.FakeTabGroupRepository
 
 @RunWith(AndroidJUnit4::class)
 class UseCasesTest {

@@ -8,11 +8,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import mozilla.components.feature.tabgroups.storage.data.TabGroup
+import mozilla.components.feature.tabgroups.storage.data.TabGroupData
+import mozilla.components.feature.tabgroups.storage.fakes.FakeTabGroupRepository
 import mozilla.components.support.utils.FakeDateTimeProvider
 import org.junit.Test
-import org.mozilla.fenix.tabgroups.fakes.FakeTabGroupRepository
-import org.mozilla.fenix.tabgroups.storage.data.TabGroup
-import org.mozilla.fenix.tabgroups.storage.data.TabGroupData
 import org.mozilla.fenix.tabstray.data.TabGroupTheme
 
 class TabGroupUseCasesTest {
@@ -35,6 +35,7 @@ class TabGroupUseCasesTest {
                 theme = TabGroupTheme.default.name,
                 closed = false,
                 lastModified = dateTimeProvider.currentTimeMillis(),
+                tabIds = listOf("1", "2"),
             )
 
         assertEquals(expected = expectedGroup, actual = createdGroup)
@@ -102,5 +103,5 @@ class TabGroupUseCasesTest {
         )
 
     private fun tabGroup(id: String, title: String = id) =
-        TabGroup(id = id, title = title, theme = TabGroupTheme.default.name, lastModified = 0L)
+        TabGroup(id = id, title = title, theme = TabGroupTheme.default.name, lastModified = 0L, tabIds = emptyList())
 }

@@ -18,6 +18,9 @@ import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.state.createTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.HitResult
+import mozilla.components.feature.tabgroups.storage.data.TabGroup
+import mozilla.components.feature.tabgroups.storage.data.TabGroupData
+import mozilla.components.feature.tabgroups.storage.fakes.FakeTabGroupRepository
 import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.support.test.robolectric.testContext
 import mozilla.components.ui.widgets.SnackbarDelegate
@@ -29,9 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.usecases.TabGroupUseCases
-import org.mozilla.fenix.tabgroups.fakes.FakeTabGroupRepository
-import org.mozilla.fenix.tabgroups.storage.data.TabGroup
-import org.mozilla.fenix.tabgroups.storage.data.TabGroupData
 import org.mozilla.fenix.tabstray.data.TabGroupTheme
 
 @RunWith(AndroidJUnit4::class)
@@ -202,6 +202,7 @@ class TabGroupContextMenuCandidateTest {
             title = title,
             theme = TabGroupTheme.default.name,
             lastModified = 0L,
+            tabIds = emptyList(),
         )
 }
 

@@ -42,12 +42,14 @@ import org.mozilla.fenix.components.share.DefaultShareSheetLauncher
 import org.mozilla.fenix.components.share.ShareSheetLauncher
 import org.mozilla.fenix.components.usecases.FenixBrowserUseCases
 import org.mozilla.fenix.components.usecases.ShareUseCases
+import org.mozilla.fenix.components.usecases.TabGroupUseCases
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.home.mars.MARSUseCases
 import org.mozilla.fenix.pbmlock.PrivateBrowsingLockUseCases
 import org.mozilla.fenix.perf.StrictModeManager
 import org.mozilla.fenix.perf.lazyMonitored
 import org.mozilla.fenix.settings.downloads.DownloadLocationManager
+import org.mozilla.fenix.tabgroups.storage.repository.TabGroupRepository
 import org.mozilla.fenix.wallpapers.WallpapersUseCases
 
 /**
@@ -65,6 +67,7 @@ class UseCases(
     private val historyStorage: Lazy<HistoryStorage>,
     private val lastSavedFolderCache: Lazy<LastSavedFolderCache>,
     private val syncedTabsCommands: Lazy<SyncedTabsCommands>,
+    private val tabGroupRepository: Lazy<TabGroupRepository>,
     adsClientProvider: Lazy<MozAdsClientProvider>,
     appStore: Lazy<AppStore>,
     client: Lazy<Client>,
@@ -189,6 +192,16 @@ class UseCases(
 
     val privateBrowsingLockUseCases by lazyMonitored {
         PrivateBrowsingLockUseCases(appStore.value)
+    }
+
+    /** Use cases for adding tabs to tab groups from outside the Tab Manager. */
+    val tabGroupUseCases by lazyMonitored {
+        TabGroupUseCases(
+            tabGroupRepository = tabGroupRepository.value,
+            defaultGroupName = { groupNumber ->
+                context.getString(R.string.create_tab_group_form_default_name, groupNumber)
+            },
+        )
     }
 
     companion object {

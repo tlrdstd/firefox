@@ -163,6 +163,7 @@ class Components(
             historyStorage = lazyMonitored { core.historyStorage },
             lastSavedFolderCache = lazyMonitored { context.components.settings.lastSavedFolderCache },
             syncedTabsCommands = lazyMonitored { backgroundServices.syncedTabsCommands },
+            tabGroupRepository = lazyMonitored { core.tabGroupRepository },
             adsClientProvider = ads.lazyAdsClientProvider,
             appStore = lazyMonitored { appStore },
             client = lazyMonitored { core.client },

@@ -63,6 +63,7 @@ jobs:
         run: >
           ./mach gradle fenix:ktfmtCheck fenix:detekt fenix:testDebugUnitTest
           --tests org.mozilla.fenix.browser.OpenInNewTabInGroupContextMenuCandidateTest
+          --tests org.mozilla.fenix.components.metrics.MetricControllerTest
 
       - name: Upload test reports
         if: failure()

@@ -4,10 +4,7 @@
 
 package org.mozilla.fenix.components.usecases
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import mozilla.components.support.utils.DateTimeProvider
 import mozilla.components.support.utils.DefaultDateTimeProvider
 import org.mozilla.fenix.tabgroups.storage.data.TabGroup
@@ -20,13 +17,11 @@ import org.mozilla.fenix.tabstray.data.TabGroupTheme
  * @param tabGroupRepository Storage holding tab groups and their tab assignments.
  * @param defaultGroupName Builds the name of a newly created group from its number, e.g. 3 produces "Group 3".
  * @param dateTimeProvider Provides the timestamp recorded on a newly created group.
- * @param scope Scope used to read from and write to [tabGroupRepository] off the main thread.
  */
 class TabGroupUseCases(
     private val tabGroupRepository: TabGroupRepository,
     private val defaultGroupName: (groupNumber: Int) -> String,
     private val dateTimeProvider: DateTimeProvider = DefaultDateTimeProvider(),
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
 ) {
 
     /**
@@ -37,25 +32,33 @@ class TabGroupUseCases(
      *
      * @param activeTabId The ID of the parent tab the new child tab was opened from.
      * @param newTabId The newly opened tab to add to a group.
+     * @return The name of the group [newTabId] was added to.
+     * @throws IllegalStateException if [activeTabId] is assigned to a tab group that is not in storage, in which case
+     *   [newTabId] is left unassigned.
      */
-    fun addTabToActiveTabsGroup(activeTabId: String, newTabId: String) {
-        scope.launch {
-            val tabGroupData = tabGroupRepository.tabGroupDataFlow.first()
-            val activeGroupId = tabGroupData.tabGroupAssignments[activeTabId]
+    suspend fun addTabToActiveTabsGroup(activeTabId: String, newTabId: String): String {
+        val tabGroupData = tabGroupRepository.tabGroupDataFlow.first()
+        val activeGroupId = tabGroupData.tabGroupAssignments[activeTabId]
 
-            if (activeGroupId == null) {
-                tabGroupRepository.createTabGroupWithTabs(
-                    tabGroup =
-                        TabGroup(
-                            title = defaultGroupName(tabGroupData.tabGroups.size + 1),
-                            theme = TabGroupTheme.default.name,
-                            lastModified = dateTimeProvider.currentTimeMillis(),
-                        ),
-                    tabIds = listOf(activeTabId, newTabId),
+        return if (activeGroupId == null) {
+            val newGroup =
+                TabGroup(
+                    title = defaultGroupName(tabGroupData.tabGroups.size + 1),
+                    theme = TabGroupTheme.default.name,
+                    lastModified = dateTimeProvider.currentTimeMillis(),
                 )
-            } else {
-                tabGroupRepository.addTabGroupAssignment(tabId = newTabId, tabGroupId = activeGroupId)
-            }
+            tabGroupRepository.createTabGroupWithTabs(
+                tabGroup = newGroup,
+                tabIds = listOf(activeTabId, newTabId),
+            )
+            newGroup.title
+        } else {
+            val activeGroup =
+                checkNotNull(tabGroupData.tabGroups.firstOrNull { it.id == activeGroupId }) {
+                    "Tab $activeTabId is assigned to tab group $activeGroupId, which is not in storage"
+                }
+            tabGroupRepository.addTabGroupAssignment(tabId = newTabId, tabGroupId = activeGroupId)
+            activeGroup.title
         }
     }
 }

@@ -1550,6 +1550,11 @@
     <string name="add_to_new_tab_group_title">New tab group</string>
     <!-- Label to add a link in a new tab inside a tab group. -->
     <string name="contextmenu_open_in_tab_group">Open in tab group</string>
+    <!-- Text shown in the snackbar after a link was opened in a new tab and added to a tab group.
+    %1$s is the name of the tab group the new tab was added to. -->
+    <string name="contextmenu_snackbar_link_added_to_tab_group">Link added to %1$s</string>
+    <!-- Text for the snackbar action button that switches to the newly opened tab. -->
+    <string name="contextmenu_snackbar_link_added_to_tab_group_action">View</string>
 
     <!-- Subtitle for the number of tabs in a tab group.
     %1$d is the number of tabs in a tab group. -->

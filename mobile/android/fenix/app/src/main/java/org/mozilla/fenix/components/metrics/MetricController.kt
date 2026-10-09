@@ -71,6 +71,7 @@ import org.mozilla.fenix.GleanMetrics.SitePermissions
 import org.mozilla.fenix.GleanMetrics.Sync
 import org.mozilla.fenix.GleanMetrics.SyncedTabs
 import org.mozilla.fenix.GleanMetrics.TrackingProtection
+import org.mozilla.fenix.browser.TabGroupContextMenuCandidate
 import org.mozilla.fenix.components.share.ShareSource
 import org.mozilla.fenix.utils.Settings
 
@@ -666,6 +667,7 @@ internal class ReleaseMetricController(
                 "mozac.feature.contextmenu.copy_image_location" to "copy_image_location",
                 "mozac.feature.contextmenu.share_image" to "share_image",
                 "fenix.contextmenu.open_with_google_lens" to "open_with_google_lens",
+                TabGroupContextMenuCandidate.OPEN_IN_TAB_GROUP_ID to "open_in_tab_group",
             )
     }
 }

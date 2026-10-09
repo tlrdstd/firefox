@@ -549,7 +549,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemIns
                 requireContext(),
                 { true },
             )
-        val tabGroupCandidates = listOf(createOpenInNewTabInGroupCandidate(context))
+        val tabGroupCandidates = listOf(createOpenInNewTabInGroupCandidate(context, view))
         return if (requireComponents.settings.nativeShareSheetEnabled && isSystemShareSheetSupported) {
             NativeShareSheetContextMenuCandidate.defaultCandidates(
                 context = context,
@@ -593,12 +593,15 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemIns
     private fun defaultDownloadsLocation() =
         DownloadLocationManager(requireComponents.settings, requireContext().contentResolver).defaultLocation
 
-    private fun createOpenInNewTabInGroupCandidate(context: Context) =
+    private fun createOpenInNewTabInGroupCandidate(context: Context, view: View) =
         TabGroupContextMenuCandidate.createOpenInNewTabInGroupCandidate(
             resources = context.resources,
             tabGroupsEnabled = context.components.settings.tabGroupsEnabled,
             tabsUseCases = context.components.useCases.tabsUseCases,
             tabGroupUseCases = context.components.useCases.tabGroupUseCases,
+            snackBarParentView = view,
+            snackbarDelegate = ContextMenuSnackbarDelegate(),
+            scope = viewLifecycleOwner.lifecycleScope,
         )
 
     private fun navigateToShareFragment(

@@ -636,7 +636,7 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler, SystemIns
     }
 
     /**
-     * Inserts "Open in new tab in group" directly after "Open in new tab".
+     * Inserts "Open link in new tab in group" directly after "Open link in new tab".
      * Prototype: it currently reuses the "Open in new tab" visibility rules and action.
      */
     private fun List<ContextMenuCandidate>.withOpenInNewTabInGroupCandidate(

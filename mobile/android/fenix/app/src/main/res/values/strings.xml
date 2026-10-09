@@ -4137,7 +4137,7 @@
     <!-- Image context menu entry that sends the long-pressed image to Google Lens -->
     <string name="context_menu_open_image_with_google_lens">Search with Google Lens</string>
     <!-- Link context menu entry that opens the long-pressed link in a new tab in a tab group -->
-    <string name="context_menu_open_link_in_new_tab_in_group">Open in new tab in group</string>
+    <string name="context_menu_open_link_in_new_tab_in_group">Open link in new tab in group</string>
     <!-- Toast shown when the user denies the camera permission requested by the Lens camera screen -->
     <string name="lens_camera_permission_denied">Permission denied</string>
     <!-- Title shown at the top of the camera screen, next to the close button, telling the

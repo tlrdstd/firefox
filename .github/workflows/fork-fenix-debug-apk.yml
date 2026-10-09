@@ -50,12 +50,6 @@ jobs:
       - name: Assemble Fenix debug APK
         run: ./mach gradle fenix:assembleDebug
 
-      - name: Disk usage
-        if: always()
-        run: |
-          df -h /
-          du -sh "$MOZBUILD_STATE_PATH" objdir-frontend ~/.gradle 2>/dev/null || true
-
       - uses: actions/upload-artifact@v7
         with:
           name: fenix-debug-arm64-${{ github.sha }}
@@ -63,3 +57,26 @@ jobs:
           path: objdir-frontend/gradle/build/mobile/android/fenix/app/outputs/apk/debug/fenix-arm64-v8a-debug.apk
           if-no-files-found: error
           retention-days: 14
+
+      # Targeted checks for files touched on this branch; keep the --tests list in sync.
+      - name: Format, static analysis and unit tests
+        run: >
+          ./mach gradle fenix:ktfmtCheck fenix:detekt fenix:testDebugUnitTest
+          --tests org.mozilla.fenix.browser.OpenInNewTabInGroupContextMenuCandidateTest
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fenix-reports-${{ github.sha }}
+          path: |
+            objdir-frontend/gradle/build/mobile/android/fenix/app/reports/
+            mobile/android/fenix/build/reports/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Disk usage
+        if: always()
+        run: |
+          df -h /
+          du -sh "$MOZBUILD_STATE_PATH" objdir-frontend ~/.gradle 2>/dev/null || true

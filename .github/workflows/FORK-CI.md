@@ -52,6 +52,10 @@ artifact storage counts toward the account's Actions storage quota.
    has ample headroom. If it shrinks, re-add a step deleting preinstalled toolchains.
 6. **Inherited workflow.** Upstream's `pr-handler.yml` only runs on pull requests; avoid
    opening PRs on the fork, or disable that workflow in the Actions UI.
+7. **Test list.** The checks step runs `ktfmtCheck`, `detekt`, and only the unit-test
+   classes listed via `--tests`. Add new test classes there when the branch adds them.
+   On failure, reports are uploaded as `fenix-reports-<sha>`. Local formatting without a
+   build: ktfmt's standalone jar (`--kotlinlang-style`, max width 120 via `.editorconfig`).
 
 ## Known inefficiencies (deliberately not optimized)
 

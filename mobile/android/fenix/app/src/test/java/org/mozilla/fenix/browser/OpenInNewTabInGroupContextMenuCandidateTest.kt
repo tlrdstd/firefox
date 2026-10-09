@@ -8,7 +8,9 @@ import android.view.View
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -22,7 +24,7 @@ import mozilla.components.feature.tabgroups.storage.data.TabGroup
 import mozilla.components.feature.tabgroups.storage.data.TabGroupData
 import mozilla.components.feature.tabgroups.storage.fakes.FakeTabGroupRepository
 import mozilla.components.feature.tabs.TabsUseCases
-import mozilla.components.support.test.mock
+import mozilla.components.support.test.fakes.engine.FakeEngine
 import mozilla.components.support.test.robolectric.testContext
 import mozilla.components.support.utils.FakeDateTimeProvider
 import mozilla.components.ui.widgets.SnackbarDelegate
@@ -44,7 +46,7 @@ class OpenInNewTabInGroupContextMenuCandidateTest {
     private fun createStore() =
         BrowserStore(
             initialState = BrowserState(tabs = listOf(parentTab), selectedTabId = parentTab.id),
-            middleware = EngineMiddleware.create(engine = mock(), scope = TestScope()),
+            middleware = EngineMiddleware.create(engine = FakeEngine(), scope = TestScope()),
         )
 
     private fun createCandidate(
@@ -104,7 +106,7 @@ class OpenInNewTabInGroupContextMenuCandidateTest {
         assertEquals(parentTab.id, newTab.parentId)
         assertEquals(parentTab.id, store.state.selectedTabId)
 
-        val data = repository.tabGroupDataFlow.value
+        val data = repository.tabGroupDataFlow.first()
         assertEquals(2, data.tabGroups.size)
         val newGroup = data.tabGroups.last()
         assertEquals(listOf(parentTab.id, newTab.id), newGroup.tabIds)
@@ -124,7 +126,7 @@ class OpenInNewTabInGroupContextMenuCandidateTest {
         createCandidate(repository = repository, scope = this).action(parentTab, link)
         advanceUntilIdle()
 
-        val newGroup = repository.tabGroupDataFlow.value.tabGroups.single()
+        val newGroup = repository.tabGroupDataFlow.first().tabGroups.single()
         assertEquals("Yellow", newGroup.theme)
         assertEquals(testContext.getString(R.string.create_tab_group_form_default_name, 1), newGroup.title)
     }
@@ -143,7 +145,7 @@ class OpenInNewTabInGroupContextMenuCandidateTest {
         advanceUntilIdle()
 
         val newTab = store.state.tabs.last()
-        val data = repository.tabGroupDataFlow.value
+        val data = repository.tabGroupDataFlow.first()
         assertEquals(1, data.tabGroups.size)
         assertEquals(group.id, data.tabGroupAssignments[newTab.id])
     }
@@ -157,7 +159,7 @@ class OpenInNewTabInGroupContextMenuCandidateTest {
         advanceUntilIdle()
 
         assertNotNull(snackbarDelegate.lastActionListener)
-        snackbarDelegate.lastActionListener!!.invoke(mock())
+        snackbarDelegate.lastActionListener?.invoke(mockk())
 
         assertEquals(store.state.tabs.last().id, store.state.selectedTabId)
     }

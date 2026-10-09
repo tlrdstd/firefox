@@ -755,6 +755,28 @@ class MetricControllerTest {
     }
 
     @Test
+    fun `WHEN the open-in-new-tab-in-group context menu item is tapped THEN item_tapped is recorded`() {
+        val controller = createReleaseMetricController()
+        val fact =
+            Fact(
+                Component.FEATURE_CONTEXTMENU,
+                mockk(relaxed = true),
+                ContextMenuFacts.Items.ITEM,
+                metadata = mapOf("item" to "fenix.contextmenu.open_in_new_tab_in_group"),
+            )
+
+        assertNull(ContextMenu.itemTapped.testGetValue())
+
+        with(controller) {
+            fact.process()
+        }
+
+        val tappedEvents = ContextMenu.itemTapped.testGetValue()
+        assertEquals(1, tappedEvents?.size)
+        assertEquals("open_in_new_tab_in_group", tappedEvents?.single()?.extra?.get("named"))
+    }
+
+    @Test
     fun `WHEN processing a CreditCardAutofillDialog fact THEN the right metric is recorded`() {
         val controller = createReleaseMetricController()
         val action = mockk<Action>(relaxed = true)

@@ -658,6 +658,7 @@ internal class ReleaseMetricController(
         private val contextMenuAllowList =
             mapOf(
                 "mozac.feature.contextmenu.open_in_new_tab" to "open_in_new_tab",
+                "fenix.contextmenu.open_in_new_tab_in_group" to "open_in_new_tab_in_group",
                 "mozac.feature.contextmenu.open_in_private_tab" to "open_in_private_tab",
                 "mozac.feature.contextmenu.open_image_in_new_tab" to "open_image_in_new_tab",
                 "mozac.feature.contextmenu.save_image" to "save_image",
